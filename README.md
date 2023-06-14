@@ -3,10 +3,10 @@ Finds minimal length solutions for the thoughtful version of Klondike (Patience)
 
 ### Piles
   - A = Waste Pile
-  - B = Clubs Pile
-  - C = Diamonds Pile
-  - D = Spades Pile
-  - E = Hearts Pile
+  - B = Clubs Pile（黑梅,C-1）
+  - C = Diamonds Pile （红钻,D-2）
+  - D = Spades Pile（黑桃,S-4）
+  - E = Hearts Pile（红桃,H-3）
   - F = Tableau 1
   - G = Tableau 2
   - H = Tableau 3
@@ -40,6 +40,8 @@ Draw pile 29-52
 ```
 
 072103023042094134111092051034044074114052123011083122012131091082124064014093033112071104132053133102084041013073063031061043081054113062024021101022032121
+
+从左到右；从上到下！！
 
 Would equate to this (+ represents visible cards), the 7C is the first card to be turned over in the draw pile when drawing one at a time, then TS, KD, etc...:
 ```
