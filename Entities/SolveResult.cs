@@ -11,7 +11,7 @@ namespace Klondike.Entities {
         public int States;
         public TimeSpan Time;
         public int Moves;
-
+        public int SolutionCount;
         public override string ToString() {
             return $"{Result} ({States})";
         }

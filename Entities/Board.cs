@@ -6,12 +6,12 @@ using System.Runtime.CompilerServices;
 using System.Text;
 namespace Klondike.Entities {
     public unsafe sealed class Board {
-        internal const int DeckSize = 52;
-        internal const int FoundationSize = 4;
-        internal const int TableauSize = 7;
-        internal const int PileSize = FoundationSize + TableauSize + 2;
-        internal const int TalonSize = 24;
-        internal const int WastePile = 0;
+        internal const int DeckSize = 52;  //（总共牌数）
+        internal const int FoundationSize = 4; //A区4列
+        internal const int TableauSize = 7; //（7列，共28张牌）
+        internal const int PileSize = FoundationSize + TableauSize + 2; //牌堆
+        internal const int TalonSize = 24;  //初始未翻牌size（右上角） 52-28
+        internal const int WastePile = 0;   //已翻牌堆的索引 （右上角）
         internal const int FoundationStart = WastePile + 1;
         internal const int FoundationEnd = FoundationStart + FoundationSize - 1;
         internal const int Foundation1 = FoundationStart;
@@ -20,7 +20,7 @@ namespace Klondike.Entities {
         internal const int Foundation4 = FoundationStart + 3;
         internal const int TableauStart = FoundationEnd + 1;
         internal const int TableauEnd = TableauStart + TableauSize - 1;
-        internal const int StockPile = TableauEnd + 1;
+        internal const int StockPile = TableauEnd + 1;   //未翻牌堆的索引（右上角）
 
         public bool AllowFoundationToTableau { get; set; }
         private readonly Card[] state, initialState, deck;
@@ -316,6 +316,156 @@ namespace Klondike.Entities {
                 Moves = result == SolveResult.Solved || result == SolveResult.Minimal ? MovesMade : 0
             };
         }
+
+        public SolveDetail SolveWithCount(int maxMoves = 250, int maxRounds = 20, int maxNodes = 10000000, bool terminateEarly = false)
+        {
+            Heap<MoveIndex> open = new Heap<MoveIndex>((int)(maxNodes));
+            HashMap<State> closed = new HashMap<State>(FindPrime((int)(maxNodes * 1.1)));
+
+            MoveNode[] nodeStorage = new MoveNode[maxNodes + 1];
+            Array.Fill(nodeStorage, new MoveNode() { Parent = -1 });
+
+            int nodeCount = 1;
+            int maxFoundationCount = 0;
+            List<Move> moves = new List<Move>(64);
+            Move[] movesStorage = new Move[movesMade.Length];
+
+            //Initialize previous state if there are moves already made
+            {
+                Array.Copy(movesMade, movesStorage, movesTotal);
+                int movesToMake = movesTotal;
+
+                Reset();
+                State state = GameState();
+                state.Moves = Estimate;
+                closed.Add(state);
+                for (int i = 0; i < movesToMake; i++)
+                {
+                    Move move = movesStorage[i];
+                    MakeMove(move);
+                    state = GameState();
+                    state.Moves = Estimate;
+                    nodeStorage[nodeCount] = new MoveNode() { Move = move, Parent = nodeCount - 1 };
+                    nodeCount++;
+                    closed.Add(state);
+                }
+            }
+
+            //Add current state
+            open.Enqueue(new MoveIndex() { Index = nodeCount - 1, Estimate = Estimate });
+
+            int bestSolutionMoveCount = maxMoves + 1;
+            int solutionIndex = -1;
+            int solutionCount = 0;
+
+            Stopwatch timer = new Stopwatch();
+            timer.Start();
+
+            while (open.Count > 0 && nodeCount < maxNodes)
+            {
+                //Get next state to evaluate
+                MoveIndex node = open.Dequeue();
+
+                Estimate estimate = node.Estimate;
+                if (estimate.Total >= bestSolutionMoveCount) { continue; }
+
+                //Initialize game to the next state
+                int movesToMake = nodeStorage[node.Index].Copy(movesStorage, nodeStorage);
+                Reset();
+                for (int i = movesToMake - 1; i >= 0; --i)
+                {
+                    MakeMove(movesStorage[i]);
+                }
+
+                //Get any available moves to check
+                moves.Clear();
+                GetAvailableMoves(moves);
+
+                //Make available moves and add them to be evaulated
+                int canAdd = moves.Count;
+                for (int i = 0; i < canAdd; ++i)
+                {
+                    Move move = moves[i];
+                    int movesAdded = MovesAdded(move);
+                    MakeMove(move);
+
+                    //Check estimated move count to be less than current best
+                    int newCurrent = estimate.Current + movesAdded;
+                    if (newCurrent > 255) { newCurrent = 255; }
+                    Estimate newEstimate = new Estimate() { Current = (byte)newCurrent, Remaining = (byte)MinimumMovesRemaining(roundCount == maxRounds) };
+
+                    if (roundCount <= maxRounds && Solved) 
+                    {
+                        solutionCount++;
+                    }
+
+                    if (newEstimate.Total < bestSolutionMoveCount && roundCount <= maxRounds)
+                    {
+                        State key = GameState();
+                        key.Moves = newEstimate;
+
+                        //Check state doesn't exist or that it used more moves than current
+                        int index = closed.Add(key);
+                        if (index < 0 || closed[index].Moves.Total > newEstimate.Total)
+                        {
+                            if (index >= 0)
+                            {
+                                closed[index].Moves = newEstimate;
+                            }
+                            nodeStorage[nodeCount] = new MoveNode() { Move = move, Parent = node.Index };
+
+                            //Check for best solution to foundations
+                            if (foundationCount > maxFoundationCount || Solved)
+                            {
+                                solutionIndex = nodeCount;
+                                maxFoundationCount = foundationCount;
+
+                                //Save solution
+                                if (Solved)
+                                {
+                                    bestSolutionMoveCount = newEstimate.Total;
+                                    nodeCount++;
+                                    if (terminateEarly) { open.Clear(); break; }
+                                }
+                            }
+
+                            if (!Solved)
+                            {
+                                short heuristic = (short)((newEstimate.Total << 1) + movesAdded + (DeckSize - foundationCount + (roundCount << 1)));
+                                open.Enqueue(new MoveIndex() { Index = nodeCount++, Priority = heuristic, Estimate = newEstimate });
+                                if (nodeCount >= maxNodes) { break; }
+                            }
+                        }
+                    }
+
+                    UndoMove();
+                }
+            }
+
+            timer.Stop();
+
+            //Reset state to best found solution
+            if (solutionIndex >= 0)
+            {
+                int movesToMake = nodeStorage[solutionIndex].Copy(movesStorage, nodeStorage);
+                Reset();
+                for (int i = movesToMake - 1; i >= 0; --i)
+                {
+                    MakeMove(movesStorage[i]);
+                }
+            }
+
+            SolveResult result = nodeCount < maxNodes ? maxFoundationCount == DeckSize ? !terminateEarly ? SolveResult.Minimal : SolveResult.Solved : SolveResult.Impossible : maxFoundationCount == DeckSize ? SolveResult.Solved : SolveResult.Unknown;
+            return new SolveDetail()
+            {
+                Result = result,
+                States = nodeCount,
+                Time = timer.Elapsed,
+                Moves = result == SolveResult.Solved || result == SolveResult.Minimal ? MovesMade : 0,
+                SolutionCount=solutionCount
+            };
+        }
+
         public SolveDetail SolveFast(int maxMoves = 250, int maxRounds = 20, int maxNodes = 2000000) {
             Heap<MoveIndex> open = new Heap<MoveIndex>(maxNodes);
             HashMap<StateFast> closed = new HashMap<StateFast>(FindPrime(maxNodes));
