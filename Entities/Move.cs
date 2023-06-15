@@ -8,12 +8,12 @@ namespace Klondike.Entities {
         public byte Value2;
 
         public Move(byte from, byte to, byte count = 1, bool flip = false) {
-            Value1 = (byte)(from | (to << 4));
-            Value2 = (byte)(count | (flip ? 0x80 : 0x00));
+            Value1 = (byte)(from | (to << 4));     //一个byte保存两个值
+            Value2 = (byte)(count | (flip ? 0x80 : 0x00));  //一个byte保存两个值
         }
         public Move(char from, char to, int count = 1, bool flip = false) {
             Value1 = (byte)(((byte)from - (byte)'A') | (((byte)to - (byte)'A') << 4));
-            Value2 = (byte)(count | (flip ? 0x80 : 0x00));
+            Value2 = (byte)(count | (flip ? 0x80 : 0x00)); //10000000
         }
         public bool IsNull {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
@@ -29,11 +29,11 @@ namespace Klondike.Entities {
         }
         public byte Count {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return (byte)(Value2 & 0x7f); }
+            get { return (byte)(Value2 & 0x7f); }    //1111111,后7位
         }
         public bool Flip {
             [MethodImpl(MethodImplOptions.AggressiveInlining)]
-            get { return (Value2 & 0x80) != 0; }
+            get { return (Value2 & 0x80) != 0; }  //最高位
         }
         public string Display {
             get {

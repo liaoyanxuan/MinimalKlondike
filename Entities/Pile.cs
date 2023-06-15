@@ -3,7 +3,7 @@ using System.Runtime.CompilerServices;
 namespace Klondike.Entities {
     public unsafe struct Pile : IComparable<Pile> {
         public int Size;
-        public int First;
+        public int First;  //表示第一个翻开的牌（上面的）
         private readonly int Index;
         private readonly Card[] Cards;
 

@@ -712,7 +712,7 @@ namespace Klondike.Entities {
                 Card fromBottom = pileFrom.BottomNoCheck;
                 int foundationMinimum = 0;
                 byte cardFoundation = CanMoveToFoundation(fromBottom, ref foundationMinimum);
-                if (cardFoundation != 255) {
+                if (cardFoundation != 255) {   //可以从Tableau 到 Foundation
                     Move temp = new Move(i, cardFoundation, 1, pileFromSize > 1 && pileFrom.UpSize == 1);
                     //is this an auto move?
                     if (!allMoves && (int)fromBottom.Rank <= foundationMinimum) {
@@ -725,7 +725,7 @@ namespace Klondike.Entities {
                 }
 
                 Card fromTop = pileFrom.TopNoCheck;
-                int pileFromLength = fromTop.Rank - fromBottom.Rank + 1;
+                int pileFromLength = fromTop.Rank - fromBottom.Rank + 1;  //移动多少张牌
                 bool kingMoved = fromTop.Rank != CardRank.King;
 
                 for (byte j = TableauStart; j <= TableauEnd; ++j) {
