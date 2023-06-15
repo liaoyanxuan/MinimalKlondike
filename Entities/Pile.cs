@@ -28,17 +28,17 @@ namespace Klondike.Entities {
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Remove(ref Pile to) {
-            to.Add(Cards[Index + --Size]);
+            to.Add(Cards[Index + --Size]); //--Size 就代表删除了
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void Remove(ref Pile to, int count) {
-            int fromIndex = Index + Size - count;
+            int fromIndex = Index + Size - count; //count表示移动多少张牌
             int toIndex = to.Index + to.Size;
             Span<Card> source = new Span<Card>(Cards, fromIndex, count);
-            Span<Card> destination = new Span<Card>(Cards, toIndex, count);
+            Span<Card> destination = new Span<Card>(Cards, toIndex, count); //所有Piles共享Cards;只是通过index区分
             source.CopyTo(destination);
-            Size -= count;
-            to.Size += count;
+            Size -= count; //from--Size减少
+            to.Size += count; //from--Size增加
         }
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public void RemoveFlip(ref Pile to, int count) {

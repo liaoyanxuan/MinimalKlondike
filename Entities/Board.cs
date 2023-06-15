@@ -619,7 +619,7 @@ namespace Klondike.Entities {
                     --foundationCount;
                 }
             } else {
-                piles[move.From].Remove(ref piles[move.To], move.Count);
+                piles[move.From].Remove(ref piles[move.To], move.Count); //count大于1只能是7列堆
             }
 
             if (move.Flip) {
@@ -688,10 +688,10 @@ namespace Klondike.Entities {
         private void SetFoundationMin() {
             int min1 = piles[Foundation1].Size;
             int min2 = piles[Foundation3].Size;
-            foundationMinimumBlack = (min1 <= min2 ? min1 : min2) + 1;
+            foundationMinimumBlack = (min1 <= min2 ? min1 : min2) + 1;//黑色较小size
             min1 = piles[Foundation2].Size;
             min2 = piles[Foundation4].Size;
-            foundationMinimumRed = (min1 <= min2 ? min1 : min2) + 1;
+            foundationMinimumRed = (min1 <= min2 ? min1 : min2) + 1; //红色较小size
         }
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         private bool CheckTableau(List<Move> moves, bool allMoves = false) {
