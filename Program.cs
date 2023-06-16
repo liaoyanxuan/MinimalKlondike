@@ -96,9 +96,10 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
 
             //// SolveDetail result = board.Solve(250, 15, maxStates);
             ////  SolveDetail result = board.Solve(250, 15, 50_000_000,true);
-            SolveDetail result = board.SolveWithCount(250, 20, 50_000_000, false);
+            //// SolveDetail result = board.SolveWithCount(250, 20, 50_000_000, false);
+            SolveDetail result = board.SolveWithCount(250, 20, 50_000_000, true);
 
-            Console.WriteLine($"Moves: {board.MovesMadeOutput}");
+            Console.WriteLine($"Moves: {board.MovesMadeOutput2}");
             Console.WriteLine();
             Console.WriteLine($"(Deal Result: {result.Result} Foundation: {board.CardsInFoundation} Moves: {board.MovesMade} Rounds: {board.TimesThroughDeck} States: {result.States} Took: {result.Time})");
             Console.WriteLine($"SolutionCount: {result.SolutionCount}");

@@ -12,7 +12,7 @@ namespace Klondike.Entities {
         public CardSuit Suit;
         public CardRank Rank;
         public byte IsRed;
-        public byte IsEven;
+        public byte IsEven;  //是否偶数
         public byte RedEven;
         public byte Order;
         public Card(int id) {
@@ -22,7 +22,7 @@ namespace Klondike.Entities {
             ID2 = (byte)(((int)Rank << 2) | (int)Suit);
             IsRed = (byte)((int)Suit & 1);
             IsEven = (byte)((int)Rank & 1);
-            RedEven = (byte)(IsRed ^ IsEven);
+            RedEven = (byte)(IsRed ^ IsEven);  //位运算，异或，两个位相同为0，相异为1
             Order = (byte)((int)Suit >> 1);
         }
         public override string ToString() {

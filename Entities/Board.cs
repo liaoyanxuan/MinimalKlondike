@@ -625,6 +625,20 @@ namespace Klondike.Entities {
             if (move.Flip) {
                 piles[move.From].Flip();
             }
+
+            if (move.Flip) 
+            {   //显示7列区中翻开的牌
+                if (move.From >= TableauStart && move.From <= TableauEnd)
+                {
+                    Card cardToFlip = piles[move.From].Bottom;
+                    if (cardToFlip.Rank!=CardRank.None) 
+                    {
+                        move.ID = cardToFlip.ID;
+                        movesMade[movesTotal - 1].ID = cardToFlip.ID;
+                    }
+                }
+            }
+           
         }
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void UndoMove() {
@@ -661,6 +675,8 @@ namespace Klondike.Entities {
                 }
             }
         }
+
+        //可作为提示逻辑的参考
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void GetAvailableMoves(List<Move> moves, bool allMoves = false) {
             SetFoundationMin();
@@ -742,14 +758,18 @@ namespace Klondike.Entities {
                     }
 
                     Card toBottom = pileTo.BottomNoCheck;
+                    // fromBottom.RedEven != toBottom.RedEven   红奇必然对黑偶；红偶必然对黑奇
                     if ((int)toBottom.Rank - (int)fromTop.Rank > 1 || fromBottom.RedEven != toBottom.RedEven || fromBottom.Rank >= toBottom.Rank) {
                         continue;
                     }
 
-                    int pileFromMoved = toBottom.Rank - fromBottom.Rank;
+                    int pileFromMoved = toBottom.Rank - fromBottom.Rank;   //to和from之间的bottom相差多少点数，就是移动多少张牌
+
+                    //pileFromMoved == pileFromLength 表示移动的牌是全部翻开的牌
                     if (allMoves || (pileFromMoved == pileFromLength && (pileFromMoved != pileFromSize || emptyPiles == 0)) || (pileFromMoved < pileFromLength && CanMoveToFoundation(pileFrom.UpNoCheck(pileFromMoved), ref foundationMinimum) != 255)) {
                         //we are moving all face up cards
                         //or look to see if we are covering a card that can be moved to the foundation
+                        //除此之外的移动无意义？值得思考
                         moves.Add(new Move(i, j, (byte)pileFromMoved, pileFromSize > pileFromMoved && pileFromMoved == pileFromLength));
                     }
                 }
@@ -763,7 +783,7 @@ namespace Klondike.Entities {
             //Check talon cards
             for (byte j = 0; j < talonCount; ++j) {
                 Card talonCard = helper.StockWaste[j];
-                int cardsToDraw = helper.CardsDrawn[j];
+                int cardsToDraw = helper.CardsDrawn[j];  //翻牌的次数（负数代表）
                 int foundationMinimum = 0;
                 byte cardFoundation = CanMoveToFoundation(talonCard, ref foundationMinimum);
                 bool flip = cardsToDraw < 0;
@@ -784,6 +804,7 @@ namespace Klondike.Entities {
 
                 for (byte i = TableauStart; i <= TableauEnd; ++i) {
                     Card tableauCard = piles[i].Bottom;
+                    //点数大1，花色不一样
                     if (tableauCard.Rank - talonCard.Rank == 1 && talonCard.IsRed != tableauCard.IsRed) {
                         moves.Add(new Move(WastePile, i, (byte)cardsToDraw, flip));
 
@@ -806,6 +827,7 @@ namespace Klondike.Entities {
                 Card foundCard = foundPile.BottomNoCheck;
                 for (byte j = TableauStart; j <= TableauEnd; ++j) {
                     Card cardTop = piles[j].Bottom;
+                    //点数大1，花色不一样
                     if (cardTop.Rank - foundCard.Rank == 1 && foundCard.IsRed != cardTop.IsRed) {
                         moves.Add(new Move(i, j));
                         if (foundCard.Rank == CardRank.King) { break; }
@@ -1264,7 +1286,58 @@ namespace Klondike.Entities {
                         wasteSize--;
                     }
 
+               
+
                     sb.Append($"{move.Display} ");
+                }
+                return sb.ToString();
+            }
+        }
+
+
+        public string MovesMadeOutput2
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                int stockSize = TalonSize;
+                int wasteSize = 0;
+                for (int i = 0; i < movesTotal; i++)
+                {
+                    Move move = movesMade[i];
+                    if (move.From == WastePile)
+                    {
+                        if (!move.Flip)
+                        {
+                            sb.Append('@', (move.Count + drawCount - 1) / drawCount);
+                            stockSize -= move.Count;
+                            wasteSize += move.Count;
+                        }
+                        else
+                        {
+                            int times = (stockSize + drawCount - 1) / drawCount;
+                            sb.Append('@', times);
+                            times = (move.Count - stockSize + drawCount - 1) / drawCount;
+                            sb.Append('#', times);   //翻一轮
+                            times = stockSize + wasteSize - move.Count;
+                            wasteSize -= times;
+                            stockSize += times;
+                        }
+
+                        wasteSize--;
+                    }
+
+                    //显示7列区中翻开的牌
+                    if (move.From >= TableauStart && move.From <= TableauEnd)
+                    {
+                        if (move.Flip)
+                        {   
+                            sb.Append($"+{move.ID.ToString()}*");
+
+                        }
+                    }
+
+                    sb.Append($"{move.Display}*");
                 }
                 return sb.ToString();
             }

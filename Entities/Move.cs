@@ -6,7 +6,7 @@ namespace Klondike.Entities {
     public struct Move {
         public byte Value1;
         public byte Value2;
-
+        public byte ID;
         public Move(byte from, byte to, byte count = 1, bool flip = false) {
             Value1 = (byte)(from | (to << 4));     //一个byte保存两个值
             Value2 = (byte)(count | (flip ? 0x80 : 0x00));  //一个byte保存两个值
