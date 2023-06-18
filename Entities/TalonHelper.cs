@@ -27,8 +27,9 @@ namespace Klondike.Entities {
             //Check cards waiting to be turned over from stock
             int stockSize = stockPile.Size;
             int position = stockSize - drawCount;
-            //待翻牌；翻1张的情况（先考虑翻1张）：翻3张的情况
-            //drawCount，次时只有当stockSize为0，翻牌区无牌；
+            //待翻牌；翻1张的情况（先考虑翻1张）：翻3张的情况-->如果stockSize不够，则
+            //drawCount，此时只有当stockSize为0，翻牌区无牌；
+            //-->如果stockSize不够但>0，则直接翻到最后一张：position为0
             if (position < 0) { position = stockSize > 0 ? 0 : -1; }
             for (int i = position; i >= 0; i -= drawCount) {
                 StockWaste[Size] = stockPile[i];
@@ -49,7 +50,7 @@ namespace Klondike.Entities {
                 amountToDraw += stockSize + wasteSize;
                 position = stockSize - position + wasteSize;
                 for (int i = position; i > 0; i -= drawCount) {
-                    if (StockUsed[i]) { break; }
+                    if (StockUsed[i]) { break; } //已经在stock使用过，直接跳出
                     StockWaste[Size] = stockPile[i];
                     CardsDrawn[Size++] = i - amountToDraw;
                 }
