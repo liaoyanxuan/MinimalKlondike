@@ -600,7 +600,7 @@ namespace Klondike.Entities {
                 if (!move.Flip) {
                     piles[StockPile].RemoveFlip(ref piles[WastePile], move.Count);
                 } else {
-                    ++roundCount;
+                    ++roundCount;  //增加一回合
                     int stockSize = piles[StockPile].Size + piles[WastePile].Size - move.Count;
                     if (stockSize >= 1) {
                         piles[WastePile].RemoveFlip(ref piles[StockPile], stockSize);
@@ -780,14 +780,16 @@ namespace Klondike.Entities {
         private bool CheckStockAndWaste(List<Move> moves, bool allMoves = false) {
             int talonCount = helper.Calculate(drawCount, piles[WastePile], piles[StockPile]);
 
-            //Check talon cards
+            //Check talon cards，waste+stock的总数
             for (byte j = 0; j < talonCount; ++j) {
                 Card talonCard = helper.StockWaste[j];
                 int cardsToDraw = helper.CardsDrawn[j];  //翻牌的次数（负数代表）
                 int foundationMinimum = 0;
                 byte cardFoundation = CanMoveToFoundation(talonCard, ref foundationMinimum);
-                bool flip = cardsToDraw < 0;
-                if (flip) { cardsToDraw = -cardsToDraw; }
+                bool flip = cardsToDraw < 0;  //此时经过redeal
+                if (flip) {
+                    cardsToDraw = -cardsToDraw;  //redeal发生情况下的翻牌数
+                }
 
                 if (cardFoundation != 255) {
                     moves.Add(new Move(WastePile, cardFoundation, (byte)cardsToDraw, flip));
@@ -808,7 +810,10 @@ namespace Klondike.Entities {
                     if (tableauCard.Rank - talonCard.Rank == 1 && talonCard.IsRed != tableauCard.IsRed) {
                         moves.Add(new Move(WastePile, i, (byte)cardsToDraw, flip));
 
-                        if (talonCard.Rank == CardRank.King && !allMoves) { break; }
+                        if (talonCard.Rank == CardRank.King && !allMoves)
+                        {
+                            break;
+                        }
                     }
                 }
             }
@@ -1315,16 +1320,18 @@ namespace Klondike.Entities {
                         }
                         else
                         {
+                           
                             int times = (stockSize + drawCount - 1) / drawCount;
-                            sb.Append('@', times);
+                            sb.Append('@', times); //stockSize阶段
+                            sb.Append('#', times);   //插入翻一轮这个动作（对于次算法来说，这个动作是个空操作）
                             times = (move.Count - stockSize + drawCount - 1) / drawCount;
-                            sb.Append('#', times);   //翻一轮
+                            sb.Append('@', times);   //wasteSize阶段
                             times = stockSize + wasteSize - move.Count;
-                            wasteSize -= times;
-                            stockSize += times;
+                            wasteSize -= times; //wasteSize-(stockSize + wasteSize - move.Count)=move.Count-stockSize
+                            stockSize += times;//wasteSize+stockSize-(move.Count-stockSize)=2*stockSize+wasteSize-move.Count
                         }
 
-                        wasteSize--;
+                        wasteSize--;//最终是移走了一张牌
                     }
 
                     //显示7列区中翻开的牌
