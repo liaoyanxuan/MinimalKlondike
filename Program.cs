@@ -91,6 +91,8 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
         }
         private static SolveDetail SolveGame(Board board, int maxStates) {
             Console.WriteLine($"Deal: {board.GetDeal()}");
+            Console.WriteLine($"DealForCardGame: {board.GetDealForCardGame()}");
+            Console.WriteLine($"DealForCardGame2: {board.GetDealForCardGame2()}");
             Console.WriteLine();
             Console.WriteLine(board);
 

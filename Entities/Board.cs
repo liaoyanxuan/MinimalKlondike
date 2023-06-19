@@ -1109,24 +1109,112 @@ namespace Klondike.Entities {
             }
             else
             {
-                for (int k = 1, m = 0; k <= TableauSize; k++)
+                for (int i = 0; i < 28; i++)
                 {
-                    for (int i = k, j = m; i <= TableauSize; i++)
-                    {
-                        AppendCard(cardSet, deck[j]);
-                        j += i;
-                    }
-                    m += k + 1;
+                    //0,2,5,9,14,20,27
+                    AppendCardForGame(cardSet, deck[i],i);
                 }
 
                 int end = deck.Length - TalonSize;
                 for (int i = deck.Length - 1; i >= end; i--)
                 {
-                    AppendCard(cardSet, deck[i]);
+                    AppendCardForGame(cardSet, deck[i],-1);
                 }
             }
             return cardSet.ToString();
         }
+
+
+        private void AppendCardForGame(StringBuilder cardSet, Card card,int i)
+        {
+            if (i == 0 || i == 2 || i == 5 || i == 9 || i == 14 || i == 20 || i == 27)
+            {
+                cardSet.Append("+");
+            }
+            cardSet.Append(card.ToString());
+            cardSet.Append("*");
+        }
+
+
+        public string GetDealForCardGame2(bool numbers = true)
+        {
+            StringBuilder cardSet = new StringBuilder(deck.Length * 3);
+            if (!numbers)
+            {
+                for (int i = 0; i < deck.Length; i++)
+                {
+                    cardSet.Append($"{deck[i]} ");
+                }
+            }
+            else
+            {
+                for (int i = 0; i < 28; i++)
+                {
+                    //0,2,5,9,14,20,27
+                    AppendCardForGame2(cardSet, deck[i], i);
+                    cardSet.Append("*");
+                }
+
+                int end = deck.Length - TalonSize;
+                for (int i = deck.Length - 1; i >= end; i--)
+                {
+                    AppendCardForGame2(cardSet, deck[i], -1);
+                    if (i > end)
+                    {
+                        cardSet.Append("*");
+                    }
+                   
+                }
+            }
+            return cardSet.ToString();
+        }
+
+
+        private void AppendCardForGame2(StringBuilder cardSet, Card card, int i)
+        {
+            //0:红方块(Diamonds)，1:红心(Hearts),2:黑梅（Clubs）,3：黑桃（Spade）
+            int forGameSuit = 0;
+            if (card.Suit == CardSuit.Diamonds)
+            {
+                forGameSuit=0;
+            }
+            else if (card.Suit == CardSuit.Hearts)
+            {
+                forGameSuit = 1;
+            }
+            else if (card.Suit == CardSuit.Clubs)
+            {
+                forGameSuit = 2;
+            }
+            else if (card.Suit == CardSuit.Spades)
+            {
+                forGameSuit = 3;
+            }
+
+            int forGameID = 13* forGameSuit + ((int)card.Rank+1);
+
+            cardSet.Append(forGameID);
+            cardSet.Append(":");
+            cardSet.Append((int)card.Rank+1);
+            cardSet.Append(":");
+
+          
+            cardSet.Append(forGameSuit);
+            
+               
+
+            cardSet.Append(":");
+            if (i == 0 || i == 2 || i == 5 || i == 9 || i == 14 || i == 20 || i == 27)
+            {
+                cardSet.Append("1");
+            }
+            else
+            {
+                cardSet.Append("0");
+            }
+           
+        }
+
 
         private void AppendCard(StringBuilder cardSet, Card card) {
             int suit = (int)card.Suit;
