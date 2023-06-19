@@ -1095,6 +1095,39 @@ namespace Klondike.Entities {
             }
             return cardSet.ToString();
         }
+
+
+        public string GetDealForCardGame(bool numbers = true)
+        {
+            StringBuilder cardSet = new StringBuilder(deck.Length * 3);
+            if (!numbers)
+            {
+                for (int i = 0; i < deck.Length; i++)
+                {
+                    cardSet.Append($"{deck[i]} ");
+                }
+            }
+            else
+            {
+                for (int k = 1, m = 0; k <= TableauSize; k++)
+                {
+                    for (int i = k, j = m; i <= TableauSize; i++)
+                    {
+                        AppendCard(cardSet, deck[j]);
+                        j += i;
+                    }
+                    m += k + 1;
+                }
+
+                int end = deck.Length - TalonSize;
+                for (int i = deck.Length - 1; i >= end; i--)
+                {
+                    AppendCard(cardSet, deck[i]);
+                }
+            }
+            return cardSet.ToString();
+        }
+
         private void AppendCard(StringBuilder cardSet, Card card) {
             int suit = (int)card.Suit;
             if (suit >= 2) {
