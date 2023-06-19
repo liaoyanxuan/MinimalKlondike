@@ -42,12 +42,15 @@ namespace Klondike.Entities {
             wasteSize--;  //排除wastePile的首牌bottom;  drawCount为1时，从0开始
             for (position = drawCount - 1; position < wasteSize; position += drawCount) {
                 StockWaste[Size] = wastePile[position];
-                CardsDrawn[Size++] = -amountToDraw - position;  //获得翻牌次数
+                CardsDrawn[Size++] = -amountToDraw - position;  //获得翻牌次数，一次翻3个
             }
 
             //Check cards in stock after a "redeal". Only happens when draw count > 1 and you have access to more cards in the talon
+            //一次翻3个
+            //1.先stock翻牌，stock翻完； 2.redeal（算法特别操作）； 3.翻waste部分，waste部分翻完，还可以翻stock部分，因为是draw count > 1，所以有可能和第一次翻的不一样
+            //因为第一次翻stock的时候，stock最后一张必定是index0(按规定)； 所以，最多也就在交错的情况下能再试一轮（最后一张必定是index0，再继续翻也是重复了）；stock翻牌序号不能与第一轮相同；
             if (position > wasteSize && wasteSize >= 0) {
-                amountToDraw += stockSize + wasteSize;
+                amountToDraw += stockSize + wasteSize;  // 2stockSize + 1+ wasteSize;  (2*stockSize+wasteSize-move.Count)
                 position = stockSize - position + wasteSize;
                 for (int i = position; i > 0; i -= drawCount) {
                     if (StockUsed[i]) { break; } //已经在stock使用过，直接跳出

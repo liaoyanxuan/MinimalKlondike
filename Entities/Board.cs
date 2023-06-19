@@ -1323,7 +1323,7 @@ namespace Klondike.Entities {
                            
                             int times = (stockSize + drawCount - 1) / drawCount;
                             sb.Append('@', times); //stockSize阶段
-                            sb.Append('#', times);   //插入翻一轮这个动作（对于次算法来说，这个动作是个空操作）
+                            sb.Append('#', 1);   //插入翻一轮这个动作（对于次算法来说，这个动作是个空操作）
                             times = (move.Count - stockSize + drawCount - 1) / drawCount;
                             sb.Append('@', times);   //wasteSize阶段
                             times = stockSize + wasteSize - move.Count;
