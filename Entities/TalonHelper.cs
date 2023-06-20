@@ -29,7 +29,7 @@ namespace Klondike.Entities {
             int position = stockSize - drawCount;
             //待翻牌；翻1张的情况（先考虑翻1张）：翻3张的情况-->如果stockSize不够，则
             //drawCount，此时只有当stockSize为0，翻牌区无牌；
-            //-->如果stockSize不够但>0，则直接翻到最后一张：position为0
+            //-->如果stockSize不够但>0，则直接翻到最后一张：position为0（最下层）
             if (position < 0) { position = stockSize > 0 ? 0 : -1; }
             for (int i = position; i >= 0; i -= drawCount) {
                 StockWaste[Size] = stockPile[i];

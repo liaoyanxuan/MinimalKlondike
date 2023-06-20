@@ -28,5 +28,62 @@ namespace Klondike.Entities {
         public override string ToString() {
             return Cards[ID];
         }
+
+        public int forCardGameID
+        {
+            get { 
+                //0:红方块(Diamonds)，1:红心(Hearts),2:黑梅（Clubs）,3：黑桃（Spade）
+                int forGameSuit = 0;
+                if (Suit == CardSuit.Diamonds)
+                {
+                    forGameSuit = 0;
+                }
+                else if (Suit == CardSuit.Hearts)
+                {
+                    forGameSuit = 1;
+                }
+                else if (Suit == CardSuit.Clubs)
+                {
+                    forGameSuit = 2;
+                }
+                else if (Suit == CardSuit.Spades)
+                {
+                    forGameSuit = 3;
+                }
+
+                int forGameID = 13 * forGameSuit + ((int)Rank + 1);
+
+                return forGameID;
+            }
+        }
+
+        public int forGameSuit 
+        {
+            get
+            {
+                //0:红方块(Diamonds)，1:红心(Hearts),2:黑梅（Clubs）,3：黑桃（Spade）
+                int forGameSuit = 0;
+                if (Suit == CardSuit.Diamonds)
+                {
+                    forGameSuit = 0;
+                }
+                else if (Suit == CardSuit.Hearts)
+                {
+                    forGameSuit = 1;
+                }
+                else if (Suit == CardSuit.Clubs)
+                {
+                    forGameSuit = 2;
+                }
+                else if (Suit == CardSuit.Spades)
+                {
+                    forGameSuit = 3;
+                }
+
+              
+
+                return forGameSuit;
+            }
+        }
     }
 }

@@ -596,6 +596,8 @@ namespace Klondike.Entities {
             movesMade[movesTotal++] = move;
             lastMove = move;
 
+
+            //WastePile 和 StockPile 进行处理，还未涉及移动
             if (move.From == WastePile && move.Count != 0) {
                 if (!move.Flip) {
                     piles[StockPile].RemoveFlip(ref piles[WastePile], move.Count);
@@ -609,6 +611,25 @@ namespace Klondike.Entities {
                     }
                 }
             }
+
+            //**************************************************************//
+            Card fromCard = Card.EMTPY;
+            //移动
+            if (move.From == WastePile)
+            {
+                //翻的肯定是wastePile的最下牌;wastePile.BottomNoCheck
+                fromCard = piles[move.From].BottomNoCheck;
+            }
+            else
+            {
+                //A区或7列区
+                fromCard = piles[move.From].moveFromCard(move.Count);
+            }
+
+            //A区或7列区
+            Card toCard = piles[move.To].moveToCard();
+            //**************************************************************//
+
 
             if (move.From == WastePile || move.Count == 1) {
                 piles[move.From].Remove(ref piles[move.To]);
@@ -626,19 +647,19 @@ namespace Klondike.Entities {
                 piles[move.From].Flip();
             }
 
-            if (move.Flip) 
-            {   //显示7列区中翻开的牌
+
+            if (move.Flip)
+            {   //显示7列区中翻开的牌(移动过后的牌面)
                 if (move.From >= TableauStart && move.From <= TableauEnd)
                 {
                     Card cardToFlip = piles[move.From].Bottom;
-                    if (cardToFlip.Rank!=CardRank.None) 
-                    {
-                        move.ID = cardToFlip.ID;
-                        movesMade[movesTotal - 1].ID = cardToFlip.ID;
+                    if (cardToFlip.Rank != CardRank.None)
+                    {      
+                        movesMade[movesTotal - 1].ID = cardToFlip.ID;   //翻牌：action--》2
                     }
                 }
             }
-           
+
         }
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
         public void UndoMove() {
@@ -1113,12 +1134,17 @@ namespace Klondike.Entities {
                 {
                     //0,2,5,9,14,20,27
                     AppendCardForGame(cardSet, deck[i],i);
+                    cardSet.Append("*");
                 }
 
                 int end = deck.Length - TalonSize;
                 for (int i = deck.Length - 1; i >= end; i--)
                 {
                     AppendCardForGame(cardSet, deck[i],-1);
+                    if (i > end)
+                    {
+                        cardSet.Append("*");
+                    }
                 }
             }
             return cardSet.ToString();
@@ -1132,7 +1158,7 @@ namespace Klondike.Entities {
                 cardSet.Append("+");
             }
             cardSet.Append(card.ToString());
-            cardSet.Append("*");
+          
         }
 
 
@@ -1172,26 +1198,8 @@ namespace Klondike.Entities {
 
         private void AppendCardForGame2(StringBuilder cardSet, Card card, int i)
         {
-            //0:红方块(Diamonds)，1:红心(Hearts),2:黑梅（Clubs）,3：黑桃（Spade）
-            int forGameSuit = 0;
-            if (card.Suit == CardSuit.Diamonds)
-            {
-                forGameSuit=0;
-            }
-            else if (card.Suit == CardSuit.Hearts)
-            {
-                forGameSuit = 1;
-            }
-            else if (card.Suit == CardSuit.Clubs)
-            {
-                forGameSuit = 2;
-            }
-            else if (card.Suit == CardSuit.Spades)
-            {
-                forGameSuit = 3;
-            }
-
-            int forGameID = 13* forGameSuit + ((int)card.Rank+1);
+          
+            int forGameID = card.forCardGameID;
 
             cardSet.Append(forGameID);
             cardSet.Append(":");
@@ -1199,7 +1207,7 @@ namespace Klondike.Entities {
             cardSet.Append(":");
 
           
-            cardSet.Append(forGameSuit);
+            cardSet.Append(card.forGameSuit);
             
                
 
@@ -1465,7 +1473,68 @@ namespace Klondike.Entities {
                         }
                     }
 
-                    sb.Append($"{move.Display}*");
+                    sb.Append($"{move.Display}");
+                    if (i< movesTotal - 1) 
+                    {
+                        sb.Append("*");
+                    }
+                   
+                }
+                return sb.ToString();
+            }
+        }
+
+
+        public string MovesMadeOutputForCardGame
+        {
+            get
+            {
+                StringBuilder sb = new StringBuilder();
+                int stockSize = TalonSize;
+                int wasteSize = 0;
+                for (int i = 0; i < movesTotal; i++)
+                {
+                    Move move = movesMade[i];
+                    if (move.From == WastePile)
+                    {
+                        if (!move.Flip)
+                        {
+                            sb.Append('@', (move.Count + drawCount - 1) / drawCount);
+                            stockSize -= move.Count;
+                            wasteSize += move.Count;
+                        }
+                        else
+                        {
+
+                            int times = (stockSize + drawCount - 1) / drawCount;
+                            sb.Append('@', times); //stockSize阶段
+                            sb.Append('#', 1);   //插入翻一轮这个动作（对于次算法来说，这个动作是个空操作）
+                            times = (move.Count - stockSize + drawCount - 1) / drawCount;
+                            sb.Append('@', times);   //wasteSize阶段
+                            times = stockSize + wasteSize - move.Count;
+                            wasteSize -= times; //wasteSize-(stockSize + wasteSize - move.Count)=move.Count-stockSize
+                            stockSize += times;//wasteSize+stockSize-(move.Count-stockSize)=2*stockSize+wasteSize-move.Count
+                        }
+
+                        wasteSize--;//最终是移走了一张牌
+                    }
+
+                    //显示7列区中翻开的牌
+                    if (move.From >= TableauStart && move.From <= TableauEnd)
+                    {
+                        if (move.Flip)
+                        {
+                            sb.Append($"+{move.ID.ToString()}*");
+
+                        }
+                    }
+
+                    sb.Append($"{move.Display}");
+                    if (i < movesTotal - 1)
+                    {
+                        sb.Append("*");
+                    }
+
                 }
                 return sb.ToString();
             }

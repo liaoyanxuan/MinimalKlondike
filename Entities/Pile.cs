@@ -95,5 +95,19 @@ namespace Klondike.Entities {
             }
             return other.Index.CompareTo(Index);
         }
+
+
+        public Card moveFromCard(int count) 
+        {
+            int fromIndex = Index + Size - count;
+            return Cards[fromIndex];
+          
+        }
+
+        public Card moveToCard()
+        {
+            int toIndex = Index + Size-1;
+            return Cards[toIndex];
+        }
     }
 }
