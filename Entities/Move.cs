@@ -14,9 +14,10 @@ namespace Klondike.Entities {
         public byte fromGameRank;
         public byte toGameRank;
 
-        public byte fromGameID;
-        public byte toGameID;
+        public int fromGameID;
+        public int toGameID;
 
+        public int fromFlipCardGameID;
 
 
         public Move(byte from, byte to, byte count = 1, bool flip = false) {

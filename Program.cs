@@ -90,9 +90,11 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
             return SolveGame(board, maxStates);
         }
         private static SolveDetail SolveGame(Board board, int maxStates) {
-            Console.WriteLine($"Deal: {board.GetDeal()}");
-            Console.WriteLine($"DealForCardGame: {board.GetDealForCardGame()}");
-            Console.WriteLine($"DealForCardGame2: {board.GetDealForCardGame2()}");
+            Console.WriteLine($"Deal:\n{board.GetDeal()}");
+            Console.WriteLine();
+            Console.WriteLine($"DealForCardGame:\n{board.GetDealForCardGame()}");
+            Console.WriteLine();
+            Console.WriteLine($"DealForCardGame2:\n{board.GetDealForCardGame2()}");
             Console.WriteLine();
             Console.WriteLine(board);
 
@@ -101,7 +103,12 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
             //// SolveDetail result = board.SolveWithCount(250, 20, 50_000_000, false);
             SolveDetail result = board.SolveWithCount(250, 20, 50_000_000, true);
 
-            Console.WriteLine($"Moves: {board.MovesMadeOutput2}");
+            Console.WriteLine($"MovesOriginal:\n{board.MovesMadeOutput}");
+            Console.WriteLine();
+            Console.WriteLine($"Moves:\n{board.MovesMadeOutput2}");
+            Console.WriteLine();
+            Console.WriteLine($"MovesForCardGame:\n{board.MovesMadeOutputForCardGame}");
+            Console.WriteLine();
             Console.WriteLine();
             Console.WriteLine($"(Deal Result: {result.Result} Foundation: {board.CardsInFoundation} Moves: {board.MovesMade} Rounds: {board.TimesThroughDeck} States: {result.States} Took: {result.Time})");
             Console.WriteLine($"SolutionCount: {result.SolutionCount}");

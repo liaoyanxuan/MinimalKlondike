@@ -612,7 +612,7 @@ namespace Klondike.Entities {
                 }
             }
 
-            //**************************************************************//
+            //**************************此时牌还没真正移动改变************************************//
             Card fromCard = Card.EMTPY;
             //移动
             if (move.From == WastePile)
@@ -627,11 +627,11 @@ namespace Klondike.Entities {
             }
 
             //A区或7列区
-            Card toCard = piles[move.To].moveToCard();
+            Card toCard = piles[move.To].moveToCard(move.To);
             //**************************************************************//
 
-
-            if (move.From == WastePile || move.Count == 1) {
+            //**************************此时牌真正移动改变************************************//
+            if (move.From == WastePile || move.Count == 1) {  //move.From == WastePile 下count是累积的，但肯定是只移最后那1张
                 piles[move.From].Remove(ref piles[move.To]);
 
                 if (move.To <= FoundationEnd) {
@@ -647,18 +647,21 @@ namespace Klondike.Entities {
                 piles[move.From].Flip();
             }
 
-
+            //**************************此时牌已经移动改变************************************//
             if (move.Flip)
             {   //显示7列区中翻开的牌(移动过后的牌面)
                 if (move.From >= TableauStart && move.From <= TableauEnd)
                 {
-                    Card cardToFlip = piles[move.From].Bottom;
+                    Card cardToFlip = piles[move.From].BottomNoCheck;
                     if (cardToFlip.Rank != CardRank.None)
                     {      
-                        movesMade[movesTotal - 1].ID = cardToFlip.ID;   //翻牌：action--》2
+                        movesMade[movesTotal - 1].fromFlipCardGameID = cardToFlip.forCardGameID;   //翻牌：action--》2
                     }
                 }
             }
+
+            movesMade[movesTotal - 1].fromGameID = fromCard.forCardGameID;
+            movesMade[movesTotal - 1].toGameID = toCard.forCardGameID;
 
         }
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -1519,24 +1522,22 @@ namespace Klondike.Entities {
                         wasteSize--;//最终是移走了一张牌
                     }
 
-                    //显示7列区中翻开的牌
+   
+                    sb.Append($"*1:{move.fromGameID}:{move.toGameID}");
+
+                    //显示7列区中翻开的牌,先移后翻牌
                     if (move.From >= TableauStart && move.From <= TableauEnd)
                     {
                         if (move.Flip)
                         {
-                            sb.Append($"+{move.ID.ToString()}*");
-
+                            // sb.Append($"+{move.ID.ToString()}*");
+                            sb.Append($"*2:{move.fromFlipCardGameID.ToString()}:-1");
                         }
                     }
 
-                    sb.Append($"{move.Display}");
-                    if (i < movesTotal - 1)
-                    {
-                        sb.Append("*");
-                    }
-
                 }
-                return sb.ToString();
+
+                return sb.ToString().Replace("@", "*3:-1:-1").Replace("#", "*6:-1:-1").Substring(1);
             }
         }
         public override string ToString() {

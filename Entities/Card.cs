@@ -15,6 +15,7 @@ namespace Klondike.Entities {
         public byte IsEven;  //是否偶数
         public byte RedEven;
         public byte Order;
+        public int forEmptyPileCardGameID;
         public Card(int id) {
             ID = (byte)id;
             Rank = (CardRank)(id % 13);
@@ -31,27 +32,42 @@ namespace Klondike.Entities {
 
         public int forCardGameID
         {
-            get { 
-                //0:红方块(Diamonds)，1:红心(Hearts),2:黑梅（Clubs）,3：黑桃（Spade）
-                int forGameSuit = 0;
-                if (Suit == CardSuit.Diamonds)
-                {
-                    forGameSuit = 0;
-                }
-                else if (Suit == CardSuit.Hearts)
-                {
-                    forGameSuit = 1;
-                }
-                else if (Suit == CardSuit.Clubs)
-                {
-                    forGameSuit = 2;
-                }
-                else if (Suit == CardSuit.Spades)
-                {
-                    forGameSuit = 3;
-                }
+           
+            get {
 
-                int forGameID = 13 * forGameSuit + ((int)Rank + 1);
+                int forGameID = -1;
+
+                if (Suit == CardSuit.None) 
+                {
+                    //空牌
+                    forGameID= forEmptyPileCardGameID;
+                }
+                else 
+                {
+                    //0:红方块(Diamonds)，1:红心(Hearts),2:黑梅（Clubs）,3：黑桃（Spade）
+                    int forGameSuit = 0;
+                    if (Suit == CardSuit.Diamonds)
+                    {
+                        forGameSuit = 0;
+                    }
+                    else if (Suit == CardSuit.Hearts)
+                    {
+                        forGameSuit = 1;
+                    }
+                    else if (Suit == CardSuit.Clubs)
+                    {
+                        forGameSuit = 2;
+                    }
+                    else if (Suit == CardSuit.Spades)
+                    {
+                        forGameSuit = 3;
+                    }
+
+                    forGameID = 13 * forGameSuit + ((int)Rank + 1);
+                }
+              
+
+
 
                 return forGameID;
             }
@@ -62,7 +78,7 @@ namespace Klondike.Entities {
             get
             {
                 //0:红方块(Diamonds)，1:红心(Hearts),2:黑梅（Clubs）,3：黑桃（Spade）
-                int forGameSuit = 0;
+                int forGameSuit = -1;
                 if (Suit == CardSuit.Diamonds)
                 {
                     forGameSuit = 0;

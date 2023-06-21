@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Runtime.CompilerServices;
 namespace Klondike.Entities {
     public unsafe struct Pile : IComparable<Pile> {
@@ -104,9 +106,65 @@ namespace Klondike.Entities {
           
         }
 
-        public Card moveToCard()
+        internal const int Foundation1 = 1;
+        internal const int Foundation2 = 2;
+        internal const int Foundation3 = 3;
+        internal const int Foundation4 = 4;
+
+        internal const int Tableau1 = 5;
+        internal const int Tableau2 = 6;
+        internal const int Tableau3 = 7;
+        internal const int Tableau4 = 8;
+        internal const int Tableau5 = 9;
+        internal const int Tableau6 = 10;
+        internal const int Tableau7 = 11;
+
+        /*
+         *  A = Waste Pile    //-300
+            B = Clubs Pile     //黑梅，1，-103
+            C = Diamonds Pile //红方，2，-102
+            D = Spades Pile   //黑桃，3，-104
+            E = Hearts Pile  //红心，4，-101
+            F = Tableau 1   //-105
+            G = Tableau 2   //-106
+            H = Tableau 3   //-107
+            I = Tableau 4   //-108
+            J = Tableau 5   //-109
+            K = Tableau 6   //-110
+            L = Tableau 7  // -111
+         */
+        public Card moveToCard(int toPileIndex)
         {
-            int toIndex = Index + Size-1;
+            int toIndex = -1;
+
+            if (Size == 0) 
+            {
+                //牌堆里是空的，没有牌；
+                // Console.WriteLine("No card in this pile");
+
+                Dictionary<int, int> indexToEmptyGameID = new Dictionary<int,int>();
+                indexToEmptyGameID[Foundation1] = -103;
+                indexToEmptyGameID[Foundation2] = -102;
+                indexToEmptyGameID[Foundation3] = -104;
+                indexToEmptyGameID[Foundation4] = -101;
+                indexToEmptyGameID[Tableau1] = -105;
+                indexToEmptyGameID[Tableau2] = -106;
+                indexToEmptyGameID[Tableau3] = -107;
+                indexToEmptyGameID[Tableau4] = -108;
+                indexToEmptyGameID[Tableau5] = -109;
+                indexToEmptyGameID[Tableau6] = -110;
+                indexToEmptyGameID[Tableau7] = -111;
+
+               
+
+                toIndex = Index;
+                Cards[toIndex].forEmptyPileCardGameID = indexToEmptyGameID[toPileIndex];
+            }
+            else 
+            {
+                 toIndex = Index + Size - 1;
+            }
+            
             return Cards[toIndex];
         }
     }
