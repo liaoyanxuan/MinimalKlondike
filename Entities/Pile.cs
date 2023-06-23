@@ -139,6 +139,8 @@ namespace Klondike.Entities {
 
             if (Size == 0) 
             {
+
+               
                 //牌堆里是空的，没有牌；
                 // Console.WriteLine("No card in this pile");
 
@@ -158,6 +160,7 @@ namespace Klondike.Entities {
                
 
                 toIndex = Index;
+                Cards[toIndex] = Card.EMTPY;  //只是通过改变size来改变删除数组中的元素，元素本身并没有复值为零
                 Cards[toIndex].forEmptyPileCardGameID = indexToEmptyGameID[toPileIndex];
             }
             else 

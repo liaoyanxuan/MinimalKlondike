@@ -613,21 +613,23 @@ namespace Klondike.Entities {
             }
 
             //**************************此时牌还没真正移动改变************************************//
-            Card fromCard = Card.EMTPY;
+           
+
+            int forCardGameID =-1;
             //移动
             if (move.From == WastePile)
             {
                 //翻的肯定是wastePile的最下牌;wastePile.BottomNoCheck
-                fromCard = piles[move.From].BottomNoCheck;
+                forCardGameID = piles[move.From].BottomNoCheck.forCardGameID;
             }
             else
             {
                 //A区或7列区
-                fromCard = piles[move.From].moveFromCard(move.Count);
+                forCardGameID = piles[move.From].moveFromCard(move.Count).forCardGameID;
             }
 
             //A区或7列区
-            Card toCard = piles[move.To].moveToCard(move.To);
+            int toCardGameID = piles[move.To].moveToCard(move.To).forCardGameID;
             //**************************************************************//
 
             //**************************此时牌真正移动改变************************************//
@@ -660,8 +662,8 @@ namespace Klondike.Entities {
                 }
             }
 
-            movesMade[movesTotal - 1].fromGameID = fromCard.forCardGameID;
-            movesMade[movesTotal - 1].toGameID = toCard.forCardGameID;
+            movesMade[movesTotal - 1].fromGameID = forCardGameID;
+            movesMade[movesTotal - 1].toGameID = toCardGameID;
 
         }
         [MethodImpl(MethodImplOptions.AggressiveOptimization)]
@@ -1503,6 +1505,7 @@ namespace Klondike.Entities {
                         if (!move.Flip)
                         {
                             sb.Append('@', (move.Count + drawCount - 1) / drawCount);
+
                             stockSize -= move.Count;
                             wasteSize += move.Count;
                         }
@@ -1510,6 +1513,7 @@ namespace Klondike.Entities {
                         {
 
                             int times = (stockSize + drawCount - 1) / drawCount;
+
                             sb.Append('@', times); //stockSize阶段
                             sb.Append('#', 1);   //插入翻一轮这个动作（对于次算法来说，这个动作是个空操作）
                             times = (move.Count - stockSize + drawCount - 1) / drawCount;
@@ -1537,7 +1541,15 @@ namespace Klondike.Entities {
 
                 }
 
-                return sb.ToString().Replace("@", "*3:-1:-1").Replace("#", "*6:-1:-1").Substring(1);
+                if (drawCount == 3)
+                {
+                    return sb.ToString().Replace("@", "*5:-1:-1").Replace("#", "*6:-1:-1").Substring(1);
+                }
+                else
+                {
+                    return sb.ToString().Replace("@", "*3:-1:-1").Replace("#", "*6:-1:-1").Substring(1);
+                }
+               
             }
         }
         public override string ToString() {
