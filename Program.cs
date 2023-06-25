@@ -80,7 +80,7 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
-            for(uint seed = 1; seed <= 2; seed++) 
+            for(uint seed = 19; seed <= 21; seed++) 
             {
                 SolveGame(seed, 1, null, 20_000_000);
                 SolveGame(seed, 3, null, 20_000_000);
@@ -152,12 +152,26 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
 
         private static SolveDetail SolveGameToFile(int seed, int drawCount, Board board, int maxStates)
         {
+            //"path/to/file.txt"
             string filePath = @"E:\GitprojectE\MinimalKlondike\generalgamecard\cardseed_"+Math.Ceiling(seed/10.0);
             string line = "This is a new line.";
             SolveDetail result;
             // 使用 StreamWriter 追加写入文件
             using (StreamWriter writer = new StreamWriter(filePath, true))
             {
+
+                writer.WriteLine();
+                Console.WriteLine();
+                if (drawCount == 1)
+                {
+                    writer.WriteLine("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+                    Console.WriteLine("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
+                }
+                else
+                {
+                    writer.WriteLine("************************************************************************************************");
+                    Console.WriteLine("************************************************************************************************");
+                }
 
                 Console.WriteLine($"seed:\n{seed}");
                 Console.WriteLine();
@@ -166,15 +180,7 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
                 Console.WriteLine($"Deal:\n{board.GetDeal()}");
                 Console.WriteLine();
 
-                writer.WriteLine();
-                if (drawCount == 1) 
-                {
-                    writer.WriteLine("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
-                }
-                else 
-                {
-                    writer.WriteLine("************************************************************************************************");
-                }
+               
               
                 writer.WriteLine($"seed:\n{seed}");
                 writer.WriteLine();
@@ -218,13 +224,16 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
                 writer.WriteLine($"(Deal Result: {result.Result} Foundation: {board.CardsInFoundation} Moves: {board.MovesMade} Rounds: {board.TimesThroughDeck} States: {result.States} Took: {result.Time})");
                 writer.WriteLine($"SolutionCount: {result.SolutionCount}");
 
+                Console.WriteLine();
                 writer.WriteLine();
                 if (drawCount == 3)
                 {
+                    Console.WriteLine("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
                     writer.WriteLine("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&");
                 }
                 else
                 {
+                    Console.WriteLine("************************************************************************************************");
                     writer.WriteLine("************************************************************************************************");
                 }
 
