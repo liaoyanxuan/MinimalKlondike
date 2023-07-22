@@ -3,6 +3,7 @@ using System;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
+using System.IO.Pipes;
 
 namespace Klondike {
     public class Program {
@@ -80,7 +81,7 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
-            for(uint seed = 19; seed <= 21; seed++) 
+            for(uint seed = 19; seed <= 19; seed++) 
             {
                 SolveGame(seed, 1, null, 20_000_000);
                 SolveGame(seed, 3, null, 20_000_000);
@@ -112,7 +113,7 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
             }
             board.AllowFoundationToTableau = true;
 
-            return SolveGameToFile((int)deal, drawCount, board, maxStates);
+            return SolveGameToCsv((int)deal, drawCount, board, maxStates);
         }
         private static SolveDetail SolveGame(string deal, int drawCount = 1, string movesMade = null, int maxStates = 50_000_000) {
             Board board = new Board(drawCount);
@@ -150,10 +151,67 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
             return result;
         }
 
+        private static SolveDetail SolveGameToCsv(int seed, int drawCount, Board board, int maxStates)
+        {
+            //"path/to/file.txt"
+            // string filePath = @"E:\GitprojectE\MinimalKlondike\generalgamecard\cardseed_"+Math.Ceiling(seed/10.0);
+
+            string filePath = @"/Users/liaoyanxuan/GitProject/MinimalKlondike/generalgamecard/cardseed_" + Math.Ceiling(seed / 10.0)+".csv";
+
+            string line = "This is a new line.";
+            SolveDetail result;
+            // 使用 StreamWriter 追加写入文件
+            using (StreamWriter writer = new StreamWriter(filePath, true))
+            {
+                // 获取StreamWriter所使用的基础流
+                FileStream fileStream = (FileStream)writer.BaseStream;
+
+                // 获取基础流的当前位置
+                long currentPosition = fileStream.Position;
+                Console.WriteLine("Current position in the file: " + currentPosition);
+
+                if (fileStream.Position == 0)
+                {
+                    writer.Write($"seed,drawCount,GetDeal,GetDealForCardGame,GetDealForCardGame2,MovesMadeOutputForCardGame,result.Result,result.CardsInFoundation,result.MovesMade,result.TimesThroughDeck,result.States,result.Time,result.SolutionCount");
+                    writer.WriteLine();
+
+                    Console.WriteLine("Currently at the beginning of the file.");
+                }
+
+                //seed,drawCount,
+                Console.Write($"{seed},{drawCount},'{board.GetDeal()}',{board.GetDealForCardGame()},{board.GetDealForCardGame2()},");     
+
+                writer.Write($"{seed},{drawCount},'{board.GetDeal()}',{board.GetDealForCardGame()},{board.GetDealForCardGame2()},");
+               
+
+                //// SolveDetail result = board.Solve(250, 15, maxStates);
+                ////  SolveDetail result = board.Solve(250, 15, 50_000_000,true);
+                //// SolveDetail result = board.SolveWithCount(250, 20, 50_000_000, false);
+                result = board.SolveWithCount(250, 20, 50_000_000, false);
+
+              
+                Console.Write($"{board.MovesMadeOutputForCardGame},{result.Result},{board.CardsInFoundation},{board.MovesMade},{board.TimesThroughDeck},{result.States},{result.Time},{result.SolutionCount}");
+
+                writer.Write($"{board.MovesMadeOutputForCardGame},{result.Result},{board.CardsInFoundation},{board.MovesMade},{board.TimesThroughDeck},{result.States},{result.Time},{result.SolutionCount}");
+              
+
+                Console.WriteLine();
+                writer.WriteLine();
+               
+
+            }
+
+
+            return result;
+        }
+
         private static SolveDetail SolveGameToFile(int seed, int drawCount, Board board, int maxStates)
         {
             //"path/to/file.txt"
-            string filePath = @"E:\GitprojectE\MinimalKlondike\generalgamecard\cardseed_"+Math.Ceiling(seed/10.0);
+            // string filePath = @"E:\GitprojectE\MinimalKlondike\generalgamecard\cardseed_"+Math.Ceiling(seed/10.0);
+
+            string filePath = @"/Users/liaoyanxuan/GitProject/MinimalKlondike/generalgamecard/cardseed_" + Math.Ceiling(seed / 10.0);
+
             string line = "This is a new line.";
             SolveDetail result;
             // 使用 StreamWriter 追加写入文件
