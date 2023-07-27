@@ -1,5 +1,6 @@
 ﻿using Klondike.Entities;
 using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
@@ -299,6 +300,46 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
 
 
             return result;
+        }
+
+
+        static void ReadAndWriteFile()
+        {
+            string filePath = "path/to/your/file.txt"; // 请替换成您实际的文件路径
+
+            List<string> lines = ReadFileLinesToList(filePath);
+
+            foreach (string line in lines)
+            {
+                Console.WriteLine(line);
+            }
+        }
+
+        static List<string> ReadFileLinesToList(string filePath)
+        {
+            List<string> lines = new List<string>();
+
+            try
+            {
+                using (StreamReader reader = new StreamReader(filePath))
+                {
+                    string line;
+                    while ((line = reader.ReadLine()) != null)
+                    {
+                        lines.Add(line);
+                    }
+                }
+            }
+            catch (FileNotFoundException)
+            {
+                Console.WriteLine("文件未找到。");
+            }
+            catch (IOException ex)
+            {
+                Console.WriteLine("发生IO错误：" + ex.Message);
+            }
+
+            return lines;
         }
     }
 }
