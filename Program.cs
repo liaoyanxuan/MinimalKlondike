@@ -5,6 +5,8 @@ using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.IO.Pipes;
+using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Klondike {
     public class Program {
@@ -75,7 +77,7 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
         }
 
 
-        public static void Main(string[] args)
+        public static void MainSeed(string[] args)
         {
            
 
@@ -84,13 +86,22 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
 
             for(uint seed = 19; seed <= 19; seed++) 
             {
-                SolveGame(seed, 1, null, 20_000_000);
-                SolveGame(seed, 3, null, 20_000_000);
+                SolveGame(seed, 1, null, 50_000_000);
+                SolveGame(seed, 3, null, 50_000_000);
             }
          
           
             sw.Stop();
             Console.WriteLine($"Done {sw.Elapsed}");
+        }
+
+        public static void Main(string[] args)
+        {
+
+            //ReadAndWriteFile();
+            //分析cargame题目，输出
+
+            AnalyzeAndWriteFile();
         }
 
         private static SolveDetail SolveGameShuffleGreenFelt(uint deal, int drawCount = 1, string movesMade = null, int maxStates = 50_000_000) {
@@ -116,6 +127,21 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
 
             return SolveGameToCsv((int)deal, drawCount, board, maxStates);
         }
+
+
+        private static SolveDetail SolveGameToCsv(string deal, int drawCount = 1, string movesMade = null, int maxStates = 50_000_000,int seed=999990)
+        {
+            Board board = new Board(drawCount);
+            board.SetDeal(deal);
+            if (!string.IsNullOrEmpty(movesMade))
+            {
+                board.PlayMoves(movesMade);
+            }
+            board.AllowFoundationToTableau = true;
+
+            return SolveGameToCsv(seed, drawCount, board, maxStates);
+        }
+
         private static SolveDetail SolveGame(string deal, int drawCount = 1, string movesMade = null, int maxStates = 50_000_000) {
             Board board = new Board(drawCount);
             board.SetDeal(deal);
@@ -152,12 +178,32 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
             return result;
         }
 
+
+        public static bool IsMacOS()
+        {
+            // 获取当前操作系统的平台
+            PlatformID platform = Environment.OSVersion.Platform;
+
+            // 判断是否为 macOS 平台
+            return platform == PlatformID.MacOSX;
+        }
+
         private static SolveDetail SolveGameToCsv(int seed, int drawCount, Board board, int maxStates)
         {
             //"path/to/file.txt"
             // string filePath = @"E:\GitprojectE\MinimalKlondike\generalgamecard\cardseed_"+Math.Ceiling(seed/10.0);
+            string filePath = @"E:\GitprojectE\MinimalKlondike\generalgamecard\cardseed_" + Math.Ceiling(seed / 10.0) + ".csv";
 
-            string filePath = @"/Users/liaoyanxuan/GitProject/MinimalKlondike/generalgamecard/cardseed_" + Math.Ceiling(seed / 10.0)+".csv";
+
+            filePath = @"E:\GitprojectE\MinimalKlondike\generalgamecard\cardseed_game100.csv";
+
+            if (IsMacOS()) 
+            {
+                 filePath = @"/Users/liaoyanxuan/GitProject/MinimalKlondike/generalgamecard/cardseed_" + Math.Ceiling(seed / 10.0) + ".csv";
+
+                filePath = @"/Users/liaoyanxuan/GitProject/MinimalKlondike/generalgamecard/cardseed_game100.csv";
+            }
+          
 
             string line = "This is a new line.";
             SolveDetail result;
@@ -188,7 +234,7 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
                 //// SolveDetail result = board.Solve(250, 15, maxStates);
                 ////  SolveDetail result = board.Solve(250, 15, 50_000_000,true);
                 //// SolveDetail result = board.SolveWithCount(250, 20, 50_000_000, false);
-                result = board.SolveWithCount(250, 20, 50_000_000, false);
+                result = board.SolveWithCount(250, 20, maxStates, false);
 
               
                 Console.Write($"{board.MovesMadeOutputForCardGame},{result.Result},{board.CardsInFoundation},{board.MovesMade},{board.TimesThroughDeck},{result.States},{result.Time},{result.SolutionCount}");
@@ -303,16 +349,74 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
         }
 
 
+        static void AnalyzeAndWriteFile()
+        {
+            //  string filePath = "path/to/your/file.txt"; // 请替换成您实际的文件路径
+            string readfilePath = @"E:\GitprojectE\MinimalKlondike\generalgamecard\Deal_OneCardData_Hard180_Deck500.txt";
+
+            if (IsMacOS())
+            {
+                readfilePath = @"/Users/liaoyanxuan/GitProject/MinimalKlondike/generalgamecard/Deal_OneCardData_Hard180_Deck500.txt";
+            }
+
+            List<string> lines = ReadFileLinesToList(readfilePath);
+
+
+            string writefilePath = @"E:\GitprojectE\MinimalKlondike\generalgamecard\cardseed_game100.csv";
+
+            if (IsMacOS())
+            {
+
+                writefilePath = @"/Users/liaoyanxuan/GitProject/MinimalKlondike/generalgamecard/cardseed_game100.csv";
+            }
+            List<string> writeFilelines = ReadFileLinesToList(writefilePath);
+
+            int start_i = 0;
+            if (writeFilelines.Count > 2) 
+            {
+                start_i = writeFilelines.Count - 1;
+            }
+
+            int end_i = Math.Min(start_i + 100,500);
+
+            for (int i = start_i; i < end_i; i++)
+            {
+                string line = lines[i];
+                SolveGameToCsv(line, 1, null, 10_000_000,100000+10*i);   //输出到csv
+            }
+
+
+        }
+
+
+        /// <summary>
+        /// 解析cargame原题目
+        /// </summary>
         static void ReadAndWriteFile()
         {
-            string filePath = "path/to/your/file.txt"; // 请替换成您实际的文件路径
+          //  string filePath = "path/to/your/file.txt"; // 请替换成您实际的文件路径
+            string filePath = @"E:\GitprojectE\MinimalKlondike\generalgamecard\ThreeCardsData_Hard195_Deck500.txt";
 
             List<string> lines = ReadFileLinesToList(filePath);
 
-            foreach (string line in lines)
+            string WirtefilePath = @"E:\GitprojectE\MinimalKlondike\generalgamecard\Deal_ThreeCardsData_Hard195_Deck500.txt";
+
+        
+            // 使用 StreamWriter 追加写入文件
+            using (StreamWriter writer = new StreamWriter(WirtefilePath, false))
             {
-                Console.WriteLine(line);
+                for (int i = 0; i < lines.Count; i++)
+                {
+                    if (i % 2 == 0)   //偶数
+                    {
+                        string line = lines[i];
+                        string dealline = DeckParse(line);
+                        Console.WriteLine(dealline);
+                        writer.WriteLine(dealline);
+                    }
+                }
             }
+         
         }
 
         static List<string> ReadFileLinesToList(string filePath)
@@ -340,6 +444,78 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
             }
 
             return lines;
+        }
+
+        public static string DeckParse(string deck)
+        {
+            List<GameCard> convertedDeck = new List<GameCard>();
+            string[] cardStr = deck.Split('*');
+            foreach (string element in cardStr)
+            {
+                string[] cardOne = element.Split(':');
+                int id = int.Parse(cardOne[0]);
+                int rank = int.Parse(cardOne[1]);
+                int suit = int.Parse(cardOne[2]);
+                bool isOpen = (cardOne[3].Equals("1"));
+                convertedDeck.Add(new GameCard(id, rank, suit, isOpen));
+            }
+          
+
+            return GetDeal(convertedDeck);
+        }
+
+        public static string GetDeal(List<GameCard> deck)
+        {
+            StringBuilder cardSet = new StringBuilder(deck.Count * 3);
+            int TableauSize = 7;//（7列，共28张牌）
+            int TalonSize = 24;  //初始未翻牌size（右上角） 52-28
+            for (int k = 1, m = 0; k <= TableauSize; k++)
+            {
+                for (int i = k, j = m; i <= TableauSize; i++)
+                {
+                    AppendCard(cardSet, deck[j]);
+                    j += i;
+                }
+                m += k + 1;
+            }
+
+            int end = deck.Count - TalonSize;
+            for (int i = end; i <= deck.Count - 1; i++)
+            {
+                AppendCard(cardSet, deck[i]);
+            }
+
+            //Console.WriteLine("GetDeal:" + cardSet.ToString());
+            return cardSet.ToString();
+        }
+
+        private static void AppendCard(StringBuilder cardSet, GameCard card)
+        {
+            //0:红方块(Diamonds)，1:红心(Hearts),2:黑梅（Clubs）,3：黑桃（Spade）
+
+
+            //1 - 4 (Clubs,Diamonds,Hearts,Spades)
+            int suitO = (int)card.Suit;
+            int suit = -1;
+            if (suitO == 0)
+            {
+                suit = 2;
+            }
+            else if (suitO == 1)
+            {
+                suit = 3;
+            }
+            else if (suitO == 2)
+            {
+                suit = 1;
+            }
+            else if (suitO == 3)
+            {
+                suit = 4;
+            }
+
+
+            cardSet.Append($"{(int)(card.Rank - 1) + 1:00}{suit}");
         }
     }
 }
