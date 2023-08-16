@@ -195,13 +195,13 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
             string filePath = @"E:\GitprojectE\MinimalKlondike\generalgamecard\cardseed_" + Math.Ceiling(seed / 10.0) + ".csv";
 
 
-            filePath = @"E:\GitprojectE\MinimalKlondike\generalgamecard\cardseed_game100.csv";
+            filePath = @"E:\GitprojectE\MinimalKlondike\generalgamecard\cardseed_game100_3draw.csv";
 
             if (IsMacOS()) 
             {
                  filePath = @"/Users/liaoyanxuan/GitProject/MinimalKlondike/generalgamecard/cardseed_" + Math.Ceiling(seed / 10.0) + ".csv";
 
-                filePath = @"/Users/liaoyanxuan/GitProject/MinimalKlondike/generalgamecard/cardseed_game100.csv";
+                filePath = @"/Users/liaoyanxuan/GitProject/MinimalKlondike/generalgamecard/cardseed_game100_3draw.csv";
             }
           
 
@@ -362,12 +362,12 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
             List<string> lines = ReadFileLinesToList(readfilePath);
 
 
-            string writefilePath = @"E:\GitprojectE\MinimalKlondike\generalgamecard\cardseed_game100.csv";
+            string writefilePath = @"E:\GitprojectE\MinimalKlondike\generalgamecard\cardseed_game100_3draw.csv";
 
             if (IsMacOS())
             {
 
-                writefilePath = @"/Users/liaoyanxuan/GitProject/MinimalKlondike/generalgamecard/cardseed_game100.csv";
+                writefilePath = @"/Users/liaoyanxuan/GitProject/MinimalKlondike/generalgamecard/cardseed_game100_3draw.csv";
             }
             List<string> writeFilelines = ReadFileLinesToList(writefilePath);
 
@@ -377,12 +377,12 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
                 start_i = writeFilelines.Count - 1;
             }
 
-            int end_i = Math.Min(start_i + 100,500);
+            int end_i = Math.Min(start_i +500,500);
 
             for (int i = start_i; i < end_i; i++)
             {
                 string line = lines[i];
-                SolveGameToCsv(line, 1, null, 10_000_000,100000+10*i);   //输出到csv
+                SolveGameToCsv(line,3, null, 30_000_000,100000+10*i);   //输出到csv
             }
 
 
