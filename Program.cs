@@ -77,16 +77,16 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
         }
 
 
-        public static void MainSeed(string[] args)
+        public static void Main(string[] args)
         {
            
 
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
-            for(uint seed = 19; seed <= 19; seed++) 
+            for(uint seed = 2001; seed <= 3000; seed++) 
             {
-                SolveGame(seed, 1, null, 50_000_000);
+              
                 SolveGame(seed, 3, null, 50_000_000);
             }
          
@@ -95,7 +95,7 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
             Console.WriteLine($"Done {sw.Elapsed}");
         }
 
-        public static void Main(string[] args)
+        public static void MainAnalyzeAndWrite(string[] args)
         {
 
             //ReadAndWriteFile();
@@ -195,7 +195,7 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
             string filePath = @"E:\GitprojectE\MinimalKlondike\generalgamecard\cardseed_" + Math.Ceiling(seed / 10.0) + ".csv";
 
 
-            filePath = @"E:\GitprojectE\MinimalKlondike\generalgamecard\cardseed_game100_3draw.csv";
+            filePath = @"E:\GitprojectE\MinimalKlondike\generalgamecard\gameItemdraw"+ drawCount+".csv";
 
             if (IsMacOS()) 
             {

@@ -1541,15 +1541,22 @@ namespace Klondike.Entities {
 
                 }
 
-                if (drawCount == 3)
+                if (movesTotal > 0)
                 {
-                    return sb.ToString().Replace("@", "*5:-1:-1").Replace("#", "*6:-1:-1").Substring(1);
+                    if (drawCount == 3)
+                    {
+                        return sb.ToString().Replace("@", "*5:-1:-1").Replace("#", "*6:-1:-1").Substring(1);
+                    }
+                    else
+                    {
+                        return sb.ToString().Replace("@", "*3:-1:-1").Replace("#", "*6:-1:-1").Substring(1);
+                    }
                 }
-                else
+                else 
                 {
-                    return sb.ToString().Replace("@", "*3:-1:-1").Replace("#", "*6:-1:-1").Substring(1);
+                    return string.Empty;
                 }
-               
+
             }
         }
         public override string ToString() {
