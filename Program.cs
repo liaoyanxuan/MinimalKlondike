@@ -185,7 +185,7 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
             PlatformID platform = Environment.OSVersion.Platform;
 
             // 判断是否为 macOS 平台
-            return platform == PlatformID.MacOSX;
+            return platform == PlatformID.Unix;
         }
 
         private static SolveDetail SolveGameToCsv(int seed, int drawCount, Board board, int maxStates)
@@ -201,7 +201,7 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
             {
                  filePath = @"/Users/liaoyanxuan/GitProject/MinimalKlondike/generalgamecard/cardseed_" + Math.Ceiling(seed / 10.0) + ".csv";
 
-                filePath = @"/Users/liaoyanxuan/GitProject/MinimalKlondike/generalgamecard/cardseed_game100_3draw.csv";
+                filePath = @"/Users/liaoyanxuan/GitProject/MinimalKlondike/generalgamecard/gameItemdraw" + drawCount + ".csv";
             }
           
 
@@ -418,6 +418,13 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
             }
          
         }
+
+        //读取csv和最终输出用于游戏的题库文件； 闯关和每日挑战
+        static void ReadCSVAndExportFinalCardGameFile()
+        {
+
+        }
+
 
         static List<string> ReadFileLinesToList(string filePath)
         {
