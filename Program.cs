@@ -422,6 +422,27 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
         //读取csv和最终输出用于游戏的题库文件； 闯关和每日挑战
         static void ReadCSVAndExportFinalCardGameFile()
         {
+            //  string filePath = "path/to/your/file.txt"; // 请替换成您实际的文件路径
+            string readfilePath = @"E:\GitprojectE\MinimalKlondike\generalgamecard\gameItemdraw3.csv";
+
+            if (IsMacOS())
+            {
+                readfilePath = @"/Users/liaoyanxuan/GitProject/MinimalKlondike/generalgamecard/gameItemdraw3.csv";
+            }
+
+         
+
+            string writefilePath = @"E:\GitprojectE\MinimalKlondike\generalgamecard\cardseed_game1600.txt";
+
+            if (IsMacOS())
+            {
+
+                writefilePath = @"/Users/liaoyanxuan/GitProject/MinimalKlondike/generalgamecard/cardseed_game1600.txt";
+            }
+
+            List<string> readFilelines = ReadFileLinesToList(readfilePath);
+
+            //打开文件，写入
 
         }
 
