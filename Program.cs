@@ -77,7 +77,7 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
         }
 
 
-        public static void Main(string[] args)
+        public static void MainGenerate(string[] args)
         {
            
 
@@ -95,13 +95,13 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
             Console.WriteLine($"Done {sw.Elapsed}");
         }
 
-        public static void MainAnalyzeAndWrite(string[] args)
+        public static void Main(string[] args)
         {
 
             //ReadAndWriteFile();
             //分析cargame题目，输出
 
-            AnalyzeAndWriteFile();
+            ReadCSVAndExportFinalCardGameFile();
         }
 
         private static SolveDetail SolveGameShuffleGreenFelt(uint deal, int drawCount = 1, string movesMade = null, int maxStates = 50_000_000) {
@@ -432,17 +432,42 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
 
          
 
-            string writefilePath = @"E:\GitprojectE\MinimalKlondike\generalgamecard\cardseed_game1600.txt";
+            string writefilePath = @"E:\GitprojectE\MinimalKlondike\generalgamecard\cardseed_game2600.txt";
 
             if (IsMacOS())
             {
 
-                writefilePath = @"/Users/liaoyanxuan/GitProject/MinimalKlondike/generalgamecard/cardseed_game1600.txt";
+                writefilePath = @"/Users/liaoyanxuan/GitProject/MinimalKlondike/generalgamecard/cardseed_game2600.txt";
             }
 
             List<string> readFilelines = ReadFileLinesToList(readfilePath);
 
             //打开文件，写入
+            try
+            {
+                // 创建一个 StreamWriter 对象，用于写入文本到文件
+                using (StreamWriter writer = new StreamWriter(writefilePath))
+                {
+
+                    // 使用 for 循环遍历 List 1--1600;1601--count
+                    for (int i = 1601; i<readFilelines.Count; i++)
+                    {
+                        string line=readFilelines[i];
+                        string[] fields = line.Split(',');
+                        writer.WriteLine(fields[4]);
+                        writer.WriteLine(fields[5]);
+                    }
+
+                   
+                  
+                }
+
+                Console.WriteLine("文本已成功写入到文件！");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine("写入文件时出错：" + ex.Message);
+            }
 
         }
 
