@@ -76,7 +76,7 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
             Console.WriteLine($"Done {sw.Elapsed}");
         }
 
-
+        //MainGenerate
         public static void MainGenerate(string[] args)
         {
            
@@ -84,10 +84,10 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
             Stopwatch sw = new Stopwatch();
             sw.Start();
 
-            for(uint seed = 2001; seed <= 3000; seed++) 
+            for(uint seed = 4516; seed <= 5000; seed++) 
             {
               
-                SolveGame(seed, 3, null, 50_000_000);
+                SolveGame(seed, 1, null, 50_000_000);
             }
          
           
@@ -95,6 +95,7 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
             Console.WriteLine($"Done {sw.Elapsed}");
         }
 
+        //MainExport
         public static void Main(string[] args)
         {
 
@@ -423,39 +424,85 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
         static void ReadCSVAndExportFinalCardGameFile()
         {
             //  string filePath = "path/to/your/file.txt"; // 请替换成您实际的文件路径
-            string readfilePath = @"E:\GitprojectE\MinimalKlondike\generalgamecard\gameItemdraw3.csv";
+            string readfilePathDraw3 = @"E:\GitprojectE\MinimalKlondike\generalgamecard\gameItemdraw3.csv";
+
+            string readfilePathDraw1 = @"E:\GitprojectE\MinimalKlondike\generalgamecard\gameItemdraw1.csv";
 
             if (IsMacOS())
             {
-                readfilePath = @"/Users/liaoyanxuan/GitProject/MinimalKlondike/generalgamecard/gameItemdraw3.csv";
+                readfilePathDraw3 = @"/Users/liaoyanxuan/GitProject/MinimalKlondike/generalgamecard/gameItemdraw3.csv";
+
+                readfilePathDraw1 = @"/Users/liaoyanxuan/GitProject/MinimalKlondike/generalgamecard/gameItemdraw1.csv";
             }
 
          
 
-            string writefilePath = @"E:\GitprojectE\MinimalKlondike\generalgamecard\cardseed_game2600.txt";
+           // string writefilePath = @"E:\GitprojectE\MinimalKlondike\generalgamecard\cardseed_game_level_1600.txt";
+             string writefilePath = @"E:\GitprojectE\MinimalKlondike\generalgamecard\cardseed_game_calendar_2460.txt";
 
             if (IsMacOS())
             {
 
-                writefilePath = @"/Users/liaoyanxuan/GitProject/MinimalKlondike/generalgamecard/cardseed_game2600.txt";
+               // writefilePath = @"/Users/liaoyanxuan/GitProject/MinimalKlondike/generalgamecard/cardseed_game_level_1600.txt";
+               writefilePath = @"/Users/liaoyanxuan/GitProject/MinimalKlondike/generalgamecard/cardseed_game_calendar_2460.txt";
             }
 
-            List<string> readFilelines = ReadFileLinesToList(readfilePath);
+            List<string> readFilelinesDraw3 = ReadFileLinesToList(readfilePathDraw3);
 
+            List<string> readFilelinesDraw1 = ReadFileLinesToList(readfilePathDraw1);
+
+            Dictionary<int, string> draw1Dic = new Dictionary<int, string>();
             //打开文件，写入
-            try
-            {
+           
                 // 创建一个 StreamWriter 对象，用于写入文本到文件
                 using (StreamWriter writer = new StreamWriter(writefilePath))
                 {
 
-                    // 使用 for 循环遍历 List 1--1600;1601--count
-                    for (int i = 1601; i<readFilelines.Count; i++)
+                    // 使用 for 循环遍历 List 1--1600;1601--count,readFilelinesDraw3.Count
+                    for (int i = 1; i < readFilelinesDraw1.Count; i++)
                     {
-                        string line=readFilelines[i];
+                        string line = readFilelinesDraw1[i];
                         string[] fields = line.Split(',');
-                        writer.WriteLine(fields[4]);
-                        writer.WriteLine(fields[5]);
+
+                        draw1Dic[int.Parse(fields[0])] = fields[5];
+                       
+                    }
+
+
+
+                }
+
+              
+
+
+           
+                // 创建一个 StreamWriter 对象，用于写入文本到文件
+                using (StreamWriter writer = new StreamWriter(writefilePath))
+                {
+
+                // 使用 for 循环遍历 List 1--1600;1601--count,readFilelinesDraw3.Count
+                for (int i = 1601; i< readFilelinesDraw3.Count; i++)
+                //for (int i = 1; i < 1601; i++)
+                {
+                        string line= readFilelinesDraw3[i];
+                        string[] fields = line.Split(',');
+
+                        writer.WriteLine(fields[4]);  //写入draw3题目
+                        writer.WriteLine(fields[5]);   //写入draw3解法
+
+                        int draw3idKey = int.Parse(fields[0]);
+                        if (draw1Dic.ContainsKey(draw3idKey))
+                        {
+                            writer.WriteLine(draw1Dic[draw3idKey]);  //写入draw1解法
+                        }
+                        else
+                        {
+                            Console.WriteLine("在draw1中找不到对应的题目!!!!==> " + draw3idKey);
+                            throw new KeyNotFoundException("在draw1中找不到对应的题目!!!!==> " + draw3idKey);
+                            
+                        }
+
+                       
                     }
 
                    
@@ -463,11 +510,7 @@ Klondike.exe -D 1 -M ""HE KE @@@@AD GD LJ @@AH @@AJ GJ @@@@AG @AB"" 081054022072
                 }
 
                 Console.WriteLine("文本已成功写入到文件！");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine("写入文件时出错：" + ex.Message);
-            }
+            
 
         }
 
